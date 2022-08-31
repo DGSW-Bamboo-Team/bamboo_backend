@@ -25,6 +25,7 @@ public class Post {
     }
 
     @Column(nullable = false)
+    @Lob
     private String content;
 
     @CreationTimestamp
