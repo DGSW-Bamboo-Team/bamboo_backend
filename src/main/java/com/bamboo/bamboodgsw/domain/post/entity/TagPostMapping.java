@@ -13,18 +13,19 @@ public class TagPostMapping {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long mapId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_post_id")
     private Post post;
     public void setPost(Post post) {
         this.post = post;
     }
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_tag_id")
     private Tag tag;
     public void setTag(Tag tag) {
         this.tag = tag;
     }
+
 
 }

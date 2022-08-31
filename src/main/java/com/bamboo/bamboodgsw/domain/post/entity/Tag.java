@@ -1,13 +1,11 @@
 package com.bamboo.bamboodgsw.domain.post.entity;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Entity
+@Entity @Builder
+@AllArgsConstructor
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tag {
 
@@ -18,8 +16,4 @@ public class Tag {
     @Column(nullable = false)
     private String hashTag;
 
-    @Builder
-    public Tag(String hashTag) {
-        this.hashTag = hashTag;
-    }
 }

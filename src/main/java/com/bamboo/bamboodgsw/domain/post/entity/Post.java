@@ -2,16 +2,14 @@ package com.bamboo.bamboodgsw.domain.post.entity;
 
 import com.bamboo.bamboodgsw.domain.post.type.PostStatus;
 import com.bamboo.bamboodgsw.domain.user.entity.User;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
+@Entity @Builder
+@AllArgsConstructor
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post {
 
@@ -21,7 +19,10 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "fk_user_id")
-    private User userId;
+    private User user;
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     @Column(nullable = false)
     private String content;
@@ -33,14 +34,4 @@ public class Post {
     @Column(nullable = false)
     private PostStatus status;
 
-    @Builder
-    public Post(Long postId,
-                User userId,
-                String content,
-                PostStatus status) {
-        this.postId = postId;
-        this.userId = userId;
-        this.content = content;
-        this.status = status;
-    }
 }
