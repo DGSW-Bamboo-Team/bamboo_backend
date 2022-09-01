@@ -53,13 +53,12 @@ public class PostService {
         tagRepository.saveAll(saveTagList);
 
         // 입력받은 해시태그를 PostTag 테이블에 추가
-        List<PostTag> savePostTagList = tagList.stream().map(it ->
-                PostTag.builder()
-                        .post(post)
-                        .tag(it)
-                        .build()
-        ).collect(Collectors.toList());
-        postTagRepository.saveAll(savePostTagList);
+        for(Tag tag : tagList) {
+            post.addMappings(PostTag.builder()
+                    .post(post)
+                    .tag(tag)
+                    .build());
+        }
 
         return PostCreateRo.builder()
                 .postId(post.getPostId())
