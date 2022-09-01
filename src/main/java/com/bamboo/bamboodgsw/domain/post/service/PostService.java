@@ -1,19 +1,35 @@
 package com.bamboo.bamboodgsw.domain.post.service;
 
 import com.bamboo.bamboodgsw.domain.post.entity.Post;
+import com.bamboo.bamboodgsw.domain.post.entity.PostAttachment;
 import com.bamboo.bamboodgsw.domain.post.entity.PostTag;
 import com.bamboo.bamboodgsw.domain.post.entity.Tag;
+import com.bamboo.bamboodgsw.domain.post.exception.PostAttachmentFailedSaveException;
+import com.bamboo.bamboodgsw.domain.post.exception.PostAttachmentNotFoundException;
+import com.bamboo.bamboodgsw.domain.post.exception.PostNotFoundException;
 import com.bamboo.bamboodgsw.domain.post.presentation.dto.PostCreateRequest;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostCreateRo;
+import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostRo;
+import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostListRo;
+import com.bamboo.bamboodgsw.domain.post.presentation.ro.TagRo;
+import com.bamboo.bamboodgsw.domain.post.repository.PostAttachmentRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.PostRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.PostTagRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.TagRepository;
 import com.bamboo.bamboodgsw.domain.post.type.PostStatus;
 import com.bamboo.bamboodgsw.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +41,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
+    private final PostAttachmentRepository postAttachmentRepository;
 
     @Transactional(rollbackFor = Exception.class)
     public PostCreateRo createPost(User user, PostCreateRequest request) {
@@ -62,6 +79,82 @@ public class PostService {
 
         return PostCreateRo.builder()
                 .postId(post.getPostId())
+                .build();
+    }
+
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Long uploadAttachment(MultipartFile request) {
+        try {
+            PostAttachment attachment = PostAttachment.builder()
+                    .originFileName(request.getOriginalFilename())
+                    .data(request.getBytes())
+                    .build();
+
+            return postAttachmentRepository.save(attachment).getAttachmentId();
+        } catch (IOException e) {
+            throw PostAttachmentFailedSaveException.EXCEPTION;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<byte[]> getAttachment(Long attachmentId) {
+        PostAttachment postAttachment = postAttachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> {
+                    throw PostAttachmentNotFoundException.EXCEPTION;
+                });
+
+        String headerData = String.format("attachment; filename=\"%s\";", postAttachment.getOriginFileName());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, headerData)
+                .body(postAttachment.getData());
+    }
+
+    @Transactional(readOnly = true)
+    public PostListRo getAllPost(int page) {
+        Pageable pageable = PageRequest.of(page - 1, 10, Sort.Direction.DESC, "postId");
+        Page<Post> postList = postRepository.findAllByStatus(PostStatus.ALLOWED, pageable);
+
+        List<PostRo> list = postList.stream().map(it ->
+                PostRo.builder()
+                        .postId(it.getPostId())
+                        .status(it.getStatus())
+                        .content(it.getContent())
+                        .hashTags(postTagRepository.findAllByPost(it)
+                                .stream().map(item ->
+                                        TagRo.builder()
+                                                .tagId(item.getTag().getTagId())
+                                                .hashTag(item.getTag().getHashTag())
+                                                .build()
+                                ).collect(Collectors.toList()))
+                        .build()
+        ).collect(Collectors.toList());
+
+        return PostListRo.builder()
+                .list(list)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public PostRo getPostById(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> {
+                    throw PostNotFoundException.EXCEPTION;
+                });
+
+        List<TagRo> hashTags = postTagRepository.findAllByPost(post)
+                .stream().map(it ->
+                    TagRo.builder()
+                            .tagId(it.getTag().getTagId())
+                            .hashTag(it.getTag().getHashTag())
+                            .build()
+                ).collect(Collectors.toList());
+
+        return PostRo.builder()
+                .postId(post.getPostId())
+                .status(post.getStatus())
+                .content(post.getContent())
+                .hashTags(hashTags)
                 .build();
     }
 
