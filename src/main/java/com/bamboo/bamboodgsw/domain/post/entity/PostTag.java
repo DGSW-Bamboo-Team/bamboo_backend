@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity @Builder
 @AllArgsConstructor
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TagPostMapping {
+public class PostTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

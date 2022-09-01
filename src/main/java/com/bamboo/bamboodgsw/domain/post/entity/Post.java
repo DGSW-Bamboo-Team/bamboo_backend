@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity @Builder
 @AllArgsConstructor
@@ -34,5 +35,11 @@ public class Post {
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private PostStatus status;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<PostTag> mappings;
+    public void addMappings(PostTag mapping) {
+        this.mappings.add(mapping);
+    }
 
 }
