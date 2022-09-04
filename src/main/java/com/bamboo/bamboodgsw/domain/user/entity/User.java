@@ -32,7 +32,7 @@ public class User {
     private List<Post> posts;
     public void addPost(Post post) {
         this.posts.add(post);
-        post.setUser(this);
+        post.modifyUser(this);
     }
 
     @Builder

@@ -18,7 +18,7 @@ public class PostAttachment {
     @ManyToOne
     @JoinColumn(name = "fk_post_id")
     private Post post;
-    public void setPost(Post post) {
+    public void modifyPost(Post post) {
         this.post = post;
     }
 

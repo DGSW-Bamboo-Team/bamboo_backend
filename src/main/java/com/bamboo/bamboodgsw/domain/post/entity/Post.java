@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity @Builder
+@Entity
 @AllArgsConstructor
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post {
@@ -21,7 +21,7 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "fk_user_id")
     private User user;
-    public void setUser(User user) {
+    public void modifyUser(User user) {
         this.user = user;
     }
 
@@ -42,4 +42,10 @@ public class Post {
         this.mappings.add(mapping);
     }
 
+    @Builder
+    public Post(User user, String content, PostStatus status) {
+        this.user = user;
+        this.content = content;
+        this.status = status;
+    }
 }

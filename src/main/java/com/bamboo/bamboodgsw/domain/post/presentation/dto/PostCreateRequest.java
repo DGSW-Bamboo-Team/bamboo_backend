@@ -10,5 +10,5 @@ public class PostCreateRequest {
 
     private String content;
 
-    private String hashTags;
+    private String[] hashTags;
 }

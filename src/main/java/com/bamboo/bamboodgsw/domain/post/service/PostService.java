@@ -54,10 +54,8 @@ public class PostService {
                 .build();
         user.addPost(post);
 
-        String[] tags = request.getHashTags().split("#");
-
         // 입력받은 해시태그를 List<Tag> 형식으로 변환
-        List<Tag> tagList = Arrays.stream(tags).map(it -> Tag.builder()
+        List<Tag> tagList = Arrays.stream(request.getHashTags()).map(it -> Tag.builder()
                 .hashTag(it)
                 .build()).collect(Collectors.toList());
 
@@ -116,18 +114,11 @@ public class PostService {
         Page<Post> postList = postRepository.findAllByStatus(PostStatus.ALLOWED, pageable);
 
         List<PostRo> list = postList.stream().map(it ->
-                PostRo.builder()
-                        .postId(it.getPostId())
-                        .status(it.getStatus())
-                        .content(it.getContent())
-                        .hashTags(postTagRepository.findAllByPost(it)
-                                .stream().map(item ->
-                                        TagRo.builder()
-                                                .tagId(item.getTag().getTagId())
-                                                .hashTag(item.getTag().getHashTag())
-                                                .build()
-                                ).collect(Collectors.toList()))
-                        .build()
+                new PostRo(it.getPostId(), it.getContent(),
+                        it.getStatus(), postTagRepository.findAllByPost(it)
+                        .stream().map(item ->
+                                new TagRo(item.getTag().getTagId(), item.getTag().getHashTag())
+                        ).collect(Collectors.toList()))
         ).collect(Collectors.toList());
 
         return PostListRo.builder()
@@ -144,18 +135,10 @@ public class PostService {
 
         List<TagRo> hashTags = postTagRepository.findAllByPost(post)
                 .stream().map(it ->
-                    TagRo.builder()
-                            .tagId(it.getTag().getTagId())
-                            .hashTag(it.getTag().getHashTag())
-                            .build()
+                    new TagRo(it.getTag().getTagId(), it.getTag().getHashTag())
                 ).collect(Collectors.toList());
 
-        return PostRo.builder()
-                .postId(post.getPostId())
-                .status(post.getStatus())
-                .content(post.getContent())
-                .hashTags(hashTags)
-                .build();
+        return new PostRo(post.getPostId(), post.getContent(), post.getStatus(), hashTags);
     }
 
 }
