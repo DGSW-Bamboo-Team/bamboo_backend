@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@AllArgsConstructor
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post {
 

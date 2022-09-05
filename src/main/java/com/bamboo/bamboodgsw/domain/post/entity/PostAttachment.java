@@ -6,8 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity @Builder
-@AllArgsConstructor
+@Entity
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostAttachment {
 
@@ -31,4 +30,10 @@ public class PostAttachment {
     @CreationTimestamp
     private LocalDateTime createAt;
 
+    @Builder
+    public PostAttachment(Post post, String originFileName, byte[] data) {
+        this.post = post;
+        this.originFileName = originFileName;
+        this.data = data;
+    }
 }

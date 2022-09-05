@@ -4,8 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Entity @Builder
-@AllArgsConstructor
+@Entity
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tag {
 
@@ -16,4 +15,8 @@ public class Tag {
     @Column(nullable = false)
     private String hashTag;
 
+    @Builder
+    public Tag(String hashTag) {
+        this.hashTag = hashTag;
+    }
 }

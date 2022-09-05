@@ -4,8 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Entity @Builder
-@AllArgsConstructor
+@Entity
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostTag {
 
@@ -27,5 +26,9 @@ public class PostTag {
         this.tag = tag;
     }
 
-
+    @Builder
+    public PostTag(Post post, Tag tag) {
+        this.post = post;
+        this.tag = tag;
+    }
 }
