@@ -28,7 +28,7 @@ public class LocalUploadService implements UploadService{
     @Transactional(rollbackFor = RuntimeException.class)
     public PostAttachmentRo uploadAttachment(MultipartFile file) {
         try {
-            if(file.isEmpty()) {
+            if(!file.isEmpty()) {
                 String uuid = UUID.randomUUID().toString();
                 String originFileName = file.getOriginalFilename();
                 String fileName = originFileName.substring(originFileName.lastIndexOf("\\") + 1);
