@@ -26,15 +26,15 @@ public class PostAttachment {
     private String originFileName;
 
     @Column(nullable = false)
-    private byte[] data;
+    private String saveFilePath;
 
     @CreationTimestamp
     private LocalDateTime createAt;
 
     @Builder
-    public PostAttachment(Post post, String originFileName, byte[] data) {
+    public PostAttachment(Post post, String originFileName, String saveFilePath) {
         this.post = post;
         this.originFileName = originFileName;
-        this.data = data;
+        this.saveFilePath = saveFilePath;
     }
 }
