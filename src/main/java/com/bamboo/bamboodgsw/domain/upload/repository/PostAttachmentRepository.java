@@ -1,6 +1,6 @@
-package com.bamboo.bamboodgsw.domain.post.repository;
+package com.bamboo.bamboodgsw.domain.upload.repository;
 
-import com.bamboo.bamboodgsw.domain.post.entity.PostAttachment;
+import com.bamboo.bamboodgsw.domain.upload.entity.PostAttachment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,5 +1,6 @@
-package com.bamboo.bamboodgsw.domain.post.entity;
+package com.bamboo.bamboodgsw.domain.upload.entity;
 
+import com.bamboo.bamboodgsw.domain.post.entity.Post;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 

@@ -1,18 +1,18 @@
 package com.bamboo.bamboodgsw.domain.post.service;
 
 import com.bamboo.bamboodgsw.domain.post.entity.Post;
-import com.bamboo.bamboodgsw.domain.post.entity.PostAttachment;
+import com.bamboo.bamboodgsw.domain.upload.entity.PostAttachment;
 import com.bamboo.bamboodgsw.domain.post.entity.PostTag;
 import com.bamboo.bamboodgsw.domain.post.entity.Tag;
-import com.bamboo.bamboodgsw.domain.post.exception.PostAttachmentFailedSaveException;
-import com.bamboo.bamboodgsw.domain.post.exception.PostAttachmentNotFoundException;
+import com.bamboo.bamboodgsw.domain.upload.exception.PostAttachmentFailedSaveException;
+import com.bamboo.bamboodgsw.domain.upload.exception.PostAttachmentNotFoundException;
 import com.bamboo.bamboodgsw.domain.post.exception.PostNotFoundException;
 import com.bamboo.bamboodgsw.domain.post.presentation.dto.PostCreateRequest;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostCreateRo;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostRo;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostListRo;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.TagRo;
-import com.bamboo.bamboodgsw.domain.post.repository.PostAttachmentRepository;
+import com.bamboo.bamboodgsw.domain.upload.repository.PostAttachmentRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.PostRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.PostTagRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.TagRepository;
@@ -78,34 +78,6 @@ public class PostService {
         return PostCreateRo.builder()
                 .postId(post.getPostId())
                 .build();
-    }
-
-    @Transactional(rollbackFor = RuntimeException.class)
-    public Long uploadAttachment(MultipartFile request) {
-        try {
-            PostAttachment attachment = PostAttachment.builder()
-                    .originFileName(request.getOriginalFilename())
-                    .data(request.getBytes())
-                    .build();
-
-            return postAttachmentRepository.save(attachment).getAttachmentId();
-        } catch (IOException e) {
-            throw PostAttachmentFailedSaveException.EXCEPTION;
-        }
-    }
-
-    @Transactional(readOnly = true)
-    public ResponseEntity<byte[]> getAttachment(Long attachmentId) {
-        PostAttachment postAttachment = postAttachmentRepository.findById(attachmentId)
-                .orElseThrow(() -> {
-                    throw PostAttachmentNotFoundException.EXCEPTION;
-                });
-
-        String headerData = String.format("attachment; filename=\"%s\";", postAttachment.getOriginFileName());
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerData)
-                .body(postAttachment.getData());
     }
 
     @Transactional(readOnly = true)
