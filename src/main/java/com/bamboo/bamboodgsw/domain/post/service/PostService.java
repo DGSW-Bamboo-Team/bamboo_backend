@@ -61,7 +61,7 @@ public class PostService {
 
         // 등록이 안되어있는 해시태그라면 Tag 테이블에 추가
         List<Tag> saveTagList = tagList.stream().filter(
-                i -> !i.getHashTag().equals(tagRepository.findByHashTag(i.getHashTag()).orElseThrow().getHashTag())
+                i -> tagRepository.existsByHashTag(i.getHashTag())
         ).map(it -> Tag.builder()
                 .hashTag(it.getHashTag())
                 .build()).collect(Collectors.toList());
