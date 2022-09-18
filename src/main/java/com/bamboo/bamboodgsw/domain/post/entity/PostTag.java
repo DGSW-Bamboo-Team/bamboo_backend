@@ -10,9 +10,9 @@ public class PostTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long mapId;
+    private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_post_id")
     private Post post;
     public void setPost(Post post) {

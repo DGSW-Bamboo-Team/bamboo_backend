@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,10 +30,10 @@ public class User {
     private UserRole userRole;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
     public void addPost(Post post) {
-        this.posts.add(post);
         post.modifyUser(this);
+        this.posts.add(post);
     }
 
     @Builder

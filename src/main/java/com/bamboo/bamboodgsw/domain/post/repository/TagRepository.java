@@ -13,4 +13,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
     boolean existsByHashTag(String hashTag);
 
+    Tag getByHashTag(String hashTag);
+
 }
