@@ -5,6 +5,7 @@ import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostCreateRo;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostRo;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostListRo;
 import com.bamboo.bamboodgsw.domain.post.service.PostService;
+import com.bamboo.bamboodgsw.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +16,15 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostService postService;
+    private final UserRepository userRepository;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/")
+    @PostMapping("/{id}")
     public PostCreateRo createPost(
+            @PathVariable("id") String id,
             @RequestBody PostCreateRequest request
     ) {
-        return postService.createPost(null, request);
+        return postService.createPost(id, request);
     }
 
     @GetMapping("/")
