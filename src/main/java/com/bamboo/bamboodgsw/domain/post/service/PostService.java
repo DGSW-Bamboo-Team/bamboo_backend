@@ -1,8 +1,11 @@
 package com.bamboo.bamboodgsw.domain.post.service;
 
 import com.bamboo.bamboodgsw.domain.post.entity.Post;
+import com.bamboo.bamboodgsw.domain.upload.entity.PostAttachment;
 import com.bamboo.bamboodgsw.domain.post.entity.PostTag;
 import com.bamboo.bamboodgsw.domain.post.entity.Tag;
+import com.bamboo.bamboodgsw.domain.upload.exception.PostAttachmentFailedSaveException;
+import com.bamboo.bamboodgsw.domain.upload.exception.PostAttachmentNotFoundException;
 import com.bamboo.bamboodgsw.domain.post.exception.PostNotFoundException;
 import com.bamboo.bamboodgsw.domain.post.exception.TagNotFoundException;
 import com.bamboo.bamboodgsw.domain.post.presentation.dto.PostCreateRequest;
@@ -10,6 +13,7 @@ import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostCreateRo;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostRo;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostListRo;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.TagRo;
+import com.bamboo.bamboodgsw.domain.upload.repository.PostAttachmentRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.PostRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.PostTagRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.TagRepository;
