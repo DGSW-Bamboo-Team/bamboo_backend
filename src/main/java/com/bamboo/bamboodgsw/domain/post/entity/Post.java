@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,15 +37,17 @@ public class Post {
     private PostStatus status;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<PostTag> mappings;
+    private List<PostTag> postTagList;
     public void addMappings(PostTag mapping) {
-        this.mappings.add(mapping);
+        mapping.setPost(this);
+        this.postTagList.add(mapping);
     }
 
     @Builder
-    public Post(User user, String content, PostStatus status) {
+    public Post(User user, String content, PostStatus status, List<PostTag> postTagList) {
         this.user = user;
         this.content = content;
         this.status = status;
+        this.postTagList = postTagList;
     }
 }

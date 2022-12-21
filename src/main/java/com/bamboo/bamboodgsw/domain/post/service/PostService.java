@@ -7,6 +7,7 @@ import com.bamboo.bamboodgsw.domain.post.entity.Tag;
 import com.bamboo.bamboodgsw.domain.upload.exception.PostAttachmentFailedSaveException;
 import com.bamboo.bamboodgsw.domain.upload.exception.PostAttachmentNotFoundException;
 import com.bamboo.bamboodgsw.domain.post.exception.PostNotFoundException;
+import com.bamboo.bamboodgsw.domain.post.exception.TagNotFoundException;
 import com.bamboo.bamboodgsw.domain.post.presentation.dto.PostCreateRequest;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostCreateRo;
 import com.bamboo.bamboodgsw.domain.post.presentation.ro.PostRo;
@@ -18,18 +19,18 @@ import com.bamboo.bamboodgsw.domain.post.repository.PostTagRepository;
 import com.bamboo.bamboodgsw.domain.post.repository.TagRepository;
 import com.bamboo.bamboodgsw.domain.post.type.PostStatus;
 import com.bamboo.bamboodgsw.domain.user.entity.User;
+import com.bamboo.bamboodgsw.domain.user.repository.UserRepository;
+import com.bamboo.bamboodgsw.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,37 +42,38 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
-    private final PostAttachmentRepository postAttachmentRepository;
+    private final UserRepository userRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public PostCreateRo createPost(User user, PostCreateRequest request) {
+    public PostCreateRo createPost(String id, PostCreateRequest request) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다"));
 
         // User 는 User 모듈 완성 후 변경 예정
         Post post = Post.builder()
                 .user(user)
                 .content(request.getContent())
                 .status(PostStatus.PENDING)
+                .postTagList(new ArrayList<>())
                 .build();
         user.addPost(post);
 
-        // 입력받은 해시태그를 List<Tag> 형식으로 변환
-        List<Tag> tagList = Arrays.stream(request.getHashTags()).map(it -> Tag.builder()
-                .hashTag(it)
-                .build()).collect(Collectors.toList());
-
-        // 등록이 안되어있는 해시태그라면 Tag 테이블에 추가
-        List<Tag> saveTagList = tagList.stream().filter(
-                i -> tagRepository.existsByHashTag(i.getHashTag())
+        List<Tag> saveTagList = Arrays.stream(request.getHashTags()).filter(
+                i -> !tagRepository.existsByHashTag(i)
         ).map(it -> Tag.builder()
-                .hashTag(it.getHashTag())
+                .hashTag(it)
                 .build()).collect(Collectors.toList());
         tagRepository.saveAll(saveTagList);
 
         // 입력받은 해시태그를 PostTag 테이블에 추가
-        for(Tag tag : tagList) {
+        for(String hashTag : request.getHashTags()) {
+            Tag tag = tagRepository.findByHashTag(hashTag)
+                    .orElseThrow(() -> {
+                        throw TagNotFoundException.EXCEPTION;
+                    });
             post.addMappings(PostTag.builder()
-                    .post(post)
-                    .tag(tag)
+                            .tag(tag)
                     .build());
         }
 
@@ -112,5 +114,6 @@ public class PostService {
 
         return new PostRo(post.getPostId(), post.getContent(), post.getStatus(), hashTags);
     }
+
 
 }
